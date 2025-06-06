@@ -2,7 +2,8 @@
 import pytest
 from app.services.email import EmailService
 from app.db.session import SessionLocal
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 @pytest.fixture
 def db_session():
