@@ -25,9 +25,21 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
+      mailhog:
+        image: mailhog/mailhog
+        ports:
+          - 1025:1025
+          - 18025:18025
+
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/email_service
       PYTHONPATH: .
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_USER: no-reply@example.com
+      SMTP_PASSWORD: password
+      PROJECT_NAME: Email Microservice
+      VERSION: 1.0.0
 
     steps:
     - name: Checkout code
