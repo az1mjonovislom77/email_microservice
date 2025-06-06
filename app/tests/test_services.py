@@ -1,32 +1,29 @@
-
-import pytest
+from unittest.mock import patch, MagicMock
 from app.services.email import EmailService
-from app.db.session import SessionLocal
 from datetime import datetime, timedelta
 
+@patch("smtplib.SMTP")
+def test_send_email_service(mock_smtp, db_session):
+    mock_server = MagicMock()
+    mock_smtp.return_value.__enter__.return_value = mock_server
 
-@pytest.fixture
-def db_session():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-def test_send_email_service(db_session):
     service = EmailService(db_session)
-    email = service.send_email(
+    result = service.send_email(
         recipients=["test@example.com"],
-        subject="Test",
-        body="Test Body"
+        subject="Test subject",
+        body="Hello!"
     )
-    assert email is not None
-    assert email.sender == "no-reply@example.com"
+
+    assert result.subject == "Test subject"
+    assert result.recipients == ["test@example.com"]
+    assert result.is_outgoing is True
 
 def test_get_stats(db_session):
     service = EmailService(db_session)
-    stats = service.get_stats(
-        date_from=datetime.now() - timedelta(days=1),
-        date_to=datetime.now()
+    result = service.get_stats(
+        date_from=datetime.utcnow() - timedelta(days=1),
+        date_to=datetime.utcnow()
     )
-    assert isinstance(stats.emails_sent, int)
+
+    assert isinstance(result.emails_sent, int)
+    assert isinstance(result.emails_received, int)
