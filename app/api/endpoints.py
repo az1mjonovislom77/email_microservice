@@ -14,7 +14,7 @@ from app.db.session import get_db
 
 router = APIRouter()
 
-@router.post("/emails/send", response_model=EmailResponse)
+@router.post("/send", response_model=EmailResponse)
 def send_email(
     email_data: EmailSendRequest,
     db: Session = Depends(get_db)
@@ -26,12 +26,9 @@ def send_email(
             body=email_data.body
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Email sending failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Email sending failed: {str(e)}")
 
-@router.get("/emails", response_model=List[EmailListResponse])
+@router.get("/", response_model=List[EmailListResponse])
 def list_emails(
     sender: Optional[str] = Query(None),
     recipient: Optional[str] = Query(None),
@@ -49,24 +46,15 @@ def list_emails(
             date_to=date_to
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to retrieve emails: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve emails: {str(e)}")
 
-@router.get("/emails/stats", response_model=EmailStatsResponse)
+@router.get("/stats", response_model=EmailStatsResponse)
 def get_email_stats(
     date_from: datetime = Query(...),
     date_to: datetime = Query(...),
     db: Session = Depends(get_db)
 ):
     try:
-        return EmailService(db).get_stats(
-            date_from=date_from,
-            date_to=date_to
-        )
+        return EmailService(db).get_stats(date_from=date_from, date_to=date_to)
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get statistics: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get statistics: {str(e)}")
