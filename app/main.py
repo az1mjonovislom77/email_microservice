@@ -23,7 +23,6 @@ def create_app() -> FastAPI:
     
     setup_logging()
     
-    # Routerni /api/v1 prefiksi bilan ro'yxatdan o'tkazamiz
     app.include_router(api_router, prefix="/api/v1")
     
     @app.on_event("startup")
